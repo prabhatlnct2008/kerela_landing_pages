@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
-import SourceTracker from '@/components/SourceTracker';
+import TrackingProvider from '@/components/TrackingProvider';
+import ExitIntentPopup from '@/components/ExitIntentPopup';
 import HeroSection from './components/HeroSection';
 import StatsSection from './components/StatsSection';
 import WhySection from './components/WhySection';
@@ -17,20 +18,23 @@ export const metadata = {
 
 export default function KeralaPremiumEscape() {
   return (
-    <main className="min-h-screen">
-      <Suspense fallback={null}>
-        <SourceTracker pageName="kerala-premium-escape" />
-      </Suspense>
+    <Suspense fallback={null}>
+      <TrackingProvider pageName="kerala-premium-escape">
+        <main className="min-h-screen">
+          <HeroSection />
+          <StatsSection />
+          <WhySection />
+          <QualificationSection />
+          <JourneySection />
+          <PricingSection />
+          <ScarcitySection />
+          <FAQSection />
+          <Footer />
 
-      <HeroSection />
-      <StatsSection />
-      <WhySection />
-      <QualificationSection />
-      <JourneySection />
-      <PricingSection />
-      <ScarcitySection />
-      <FAQSection />
-      <Footer />
-    </main>
+          {/* Exit Intent Popup */}
+          <ExitIntentPopup />
+        </main>
+      </TrackingProvider>
+    </Suspense>
   );
 }

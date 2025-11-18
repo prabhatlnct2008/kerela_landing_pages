@@ -1,5 +1,6 @@
 import { Suspense } from 'react';
-import SourceTracker from '@/components/SourceTracker';
+import TrackingProvider from '@/components/TrackingProvider';
+import ExitIntentPopup from '@/components/ExitIntentPopup';
 import HeroSection from './components/HeroSection';
 import StatsBar from './components/StatsBar';
 import WhySection from './components/WhySection';
@@ -16,19 +17,22 @@ export const metadata = {
 
 export default function KeralaGroupTour() {
   return (
-    <main className="min-h-screen bg-white">
-      <Suspense fallback={null}>
-        <SourceTracker pageName="kerala-group-tour" />
-      </Suspense>
+    <Suspense fallback={null}>
+      <TrackingProvider pageName="kerala-group-tour">
+        <main className="min-h-screen bg-white">
+          <HeroSection />
+          <StatsBar />
+          <WhySection />
+          <QualificationSection />
+          <JourneySection />
+          <PricingSection />
+          <FAQSection />
+          <Footer />
 
-      <HeroSection />
-      <StatsBar />
-      <WhySection />
-      <QualificationSection />
-      <JourneySection />
-      <PricingSection />
-      <FAQSection />
-      <Footer />
-    </main>
+          {/* Exit Intent Popup */}
+          <ExitIntentPopup />
+        </main>
+      </TrackingProvider>
+    </Suspense>
   );
 }
