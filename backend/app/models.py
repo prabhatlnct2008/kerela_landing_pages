@@ -48,7 +48,7 @@ class Event(db.Model):
     element_class = db.Column(db.String(100))
     element_text = db.Column(db.Text)
     page_url = db.Column(db.String(500))
-    metadata = db.Column(db.JSON)
+    extra_data = db.Column(db.JSON)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
     def to_dict(self):
@@ -61,7 +61,7 @@ class Event(db.Model):
             'element_class': self.element_class,
             'element_text': self.element_text,
             'page_url': self.page_url,
-            'metadata': self.metadata,
+            'metadata': self.extra_data,  # Return as 'metadata' in API for consistency
             'timestamp': self.timestamp.isoformat()
         }
 
@@ -77,7 +77,7 @@ class UserDetail(db.Model):
     phone = db.Column(db.String(20))
     message = db.Column(db.Text)
     form_type = db.Column(db.String(50))  # exit_intent, contact_form, etc.
-    metadata = db.Column(db.JSON)
+    extra_data = db.Column(db.JSON)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
     def to_dict(self):
@@ -89,6 +89,6 @@ class UserDetail(db.Model):
             'phone': self.phone,
             'message': self.message,
             'form_type': self.form_type,
-            'metadata': self.metadata,
+            'metadata': self.extra_data,  # Return as 'metadata' in API for consistency
             'created_at': self.created_at.isoformat()
         }

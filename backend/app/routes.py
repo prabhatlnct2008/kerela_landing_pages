@@ -80,7 +80,7 @@ def track_event():
             element_class=data.get('element_class'),
             element_text=data.get('element_text'),
             page_url=data.get('page_url'),
-            metadata=data.get('metadata', {})
+            extra_data=data.get('metadata', {})
         )
 
         db.session.add(event)
@@ -131,7 +131,7 @@ def submit_user_details():
             phone=data.get('phone'),
             message=data.get('message'),
             form_type=data.get('form_type', 'contact_form'),
-            metadata=data.get('metadata', {})
+            extra_data=data.get('metadata', {})
         )
 
         db.session.add(user_detail)
