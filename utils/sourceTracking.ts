@@ -59,7 +59,7 @@ export function getStoredSource(): SourceData | null {
  * Appends source to WhatsApp URL
  */
 export function getWhatsAppUrl(message: string, source?: string | null): string {
-  const phoneNumber = '919999999999'; // Replace with actual number
+  const phoneNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '919999999999';
   const baseMessage = encodeURIComponent(message);
   const sourceInfo = source ? encodeURIComponent(`\n\nSource: ${source}`) : '';
   return `https://wa.me/${phoneNumber}?text=${baseMessage}${sourceInfo}`;

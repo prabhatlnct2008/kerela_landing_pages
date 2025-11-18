@@ -7,6 +7,10 @@ import WhySection from './components/WhySection';
 import QualificationSection from './components/QualificationSection';
 import JourneySection from './components/JourneySection';
 import PricingSection from './components/PricingSection';
+import TestimonialsSection from './components/TestimonialsSection';
+import ContactFormSection from './components/ContactFormSection';
+import InclusionsSection from './components/InclusionsSection';
+import ServicePromiseSection from './components/ServicePromiseSection';
 import ScarcitySection from './components/ScarcitySection';
 import FAQSection from './components/FAQSection';
 import Footer from './components/Footer';
@@ -27,6 +31,10 @@ export default function KeralaPremiumEscape() {
           <QualificationSection />
           <JourneySection />
           <PricingSection />
+          <TestimonialsSection />
+          <ContactFormSection />
+          <InclusionsSection />
+          <ServicePromiseSection />
           <ScarcitySection />
           <FAQSection />
           <Footer />

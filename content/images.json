@@ -1,0 +1,124 @@
+{
+  "kerala-premium-escape": {
+    "hero": {
+      "background": "/images/hero/kerala-backwaters.jpg",
+      "alt": "Kerala backwaters with traditional houseboat"
+    },
+    "testimonials": [
+      {
+        "id": 1,
+        "image": "/images/testimonials/user-1.jpg",
+        "alt": "Happy traveler portrait"
+      },
+      {
+        "id": 2,
+        "image": "/images/testimonials/user-2.jpg",
+        "alt": "Happy traveler portrait"
+      },
+      {
+        "id": 3,
+        "image": "/images/testimonials/user-3.jpg",
+        "alt": "Happy traveler portrait"
+      }
+    ],
+    "journey": [
+      {
+        "day": 1,
+        "image": "/images/journey/day-1-kochi.jpg",
+        "alt": "Kochi - Fort Kochi streets and Chinese fishing nets"
+      },
+      {
+        "day": 2,
+        "image": "/images/journey/day-2-munnar.jpg",
+        "alt": "Munnar - Tea plantations and hills"
+      },
+      {
+        "day": 3,
+        "image": "/images/journey/day-3-thekkady.jpg",
+        "alt": "Thekkady - Periyar wildlife sanctuary"
+      },
+      {
+        "day": 4,
+        "image": "/images/journey/day-4-alleppey.jpg",
+        "alt": "Alleppey - Houseboat on backwaters"
+      },
+      {
+        "day": 5,
+        "image": "/images/journey/day-5-departure.jpg",
+        "alt": "Departure day memories"
+      }
+    ],
+    "gallery": [
+      "/images/gallery/houseboat-sunset.jpg",
+      "/images/gallery/tea-garden-worker.jpg",
+      "/images/gallery/kathakali-performance.jpg",
+      "/images/gallery/backwater-village.jpg",
+      "/images/gallery/spice-plantation.jpg",
+      "/images/gallery/elephant-bath.jpg"
+    ]
+  },
+  "kerala-group-tour": {
+    "hero": {
+      "background": "/images/hero/kerala-tea-plantations.jpg",
+      "alt": "Kerala tea plantations in Munnar"
+    },
+    "testimonials": [
+      {
+        "id": 1,
+        "image": "/images/testimonials/group-1.jpg",
+        "alt": "Group of travelers"
+      },
+      {
+        "id": 2,
+        "image": "/images/testimonials/group-2.jpg",
+        "alt": "Group of travelers"
+      },
+      {
+        "id": 3,
+        "image": "/images/testimonials/group-3.jpg",
+        "alt": "Group of travelers"
+      }
+    ],
+    "journey": [
+      {
+        "day": 1,
+        "image": "/images/journey/day-1-arrival.jpg",
+        "alt": "Welcome to Kerala"
+      },
+      {
+        "day": 2,
+        "image": "/images/journey/day-2-hills.jpg",
+        "alt": "Exploring the hills"
+      },
+      {
+        "day": 3,
+        "image": "/images/journey/day-3-wildlife.jpg",
+        "alt": "Wildlife experience"
+      },
+      {
+        "day": 4,
+        "image": "/images/journey/day-4-backwaters.jpg",
+        "alt": "Backwater cruise"
+      },
+      {
+        "day": 5,
+        "image": "/images/journey/day-5-beach.jpg",
+        "alt": "Beach relaxation"
+      }
+    ],
+    "gallery": [
+      "/images/gallery/group-photo.jpg",
+      "/images/gallery/cultural-show.jpg",
+      "/images/gallery/ayurvedic-spa.jpg",
+      "/images/gallery/local-food.jpg",
+      "/images/gallery/boat-ride.jpg",
+      "/images/gallery/sunset-view.jpg"
+    ]
+  },
+  "placeholders": {
+    "hero": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1920' height='1080'%3E%3Crect fill='%23047857' width='1920' height='1080'/%3E%3Ctext fill='white' font-family='Arial' font-size='48' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EHero Image%3C/text%3E%3C/svg%3E",
+    "testimonial": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Ccircle fill='%2310b981' cx='200' cy='200' r='200'/%3E%3Ctext fill='white' font-family='Arial' font-size='120' x='50%25' y='55%25' text-anchor='middle' dominant-baseline='middle'%3E👤%3C/text%3E%3C/svg%3E",
+    "journey": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='800' height='600'%3E%3Crect fill='%2306b6d4' width='800' height='600'/%3E%3Ctext fill='white' font-family='Arial' font-size='36' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EJourney Image%3C/text%3E%3C/svg%3E",
+    "gallery": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Crect fill='%238b5cf6' width='600' height='400'/%3E%3Ctext fill='white' font-family='Arial' font-size='32' x='50%25' y='50%25' text-anchor='middle' dominant-baseline='middle'%3EGallery Image%3C/text%3E%3C/svg%3E"
+  }
+}
