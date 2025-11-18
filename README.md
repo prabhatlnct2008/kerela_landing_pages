@@ -8,10 +8,25 @@ Two high-converting landing pages for Kerala tour packages with comprehensive tr
 - **Two Landing Page Variants**:
   - **Premium Escape** (`/kerala-premium-escape`) - Dark theme with dramatic hero section
   - **Group Tour** (`/kerala-group-tour`) - Light theme with clean, modern design
-- **Pixel-Perfect Design**: Based on provided screenshot segments
+- **Pixel-Perfect Design**: Based on provided screenshot segments with all sections implemented
 - **Fully Responsive**: Mobile-first design that works on all devices
-- **WhatsApp Integration**: Direct CTA buttons with source tracking
+- **WhatsApp Integration**: Direct CTA buttons with source tracking (configurable via .env)
 - **Performance Optimized**: Built with Next.js for fast load times
+
+### Image Management System
+- **Configuration-based**: Manage all images through `content/images.json`
+- **Automatic Placeholders**: Beautiful SVG placeholders when images are missing
+- **Easy Updates**: Simply add images to `public/images/` and update config
+- **Organized Structure**: Separate folders for hero, testimonials, journey, and gallery images
+- **Full Documentation**: Comprehensive guide in `content/README.md`
+
+### Admin Dashboard
+- **Secure Login**: Protected admin area at `/admin/login`
+- **Real-time Analytics**: View sessions, events, and leads in beautiful tables
+- **Time Range Filters**: Analyze data from last 24 hours to 90 days
+- **Quick Actions**: Direct links to landing pages and analytics
+- **Session Management**: 24-hour auto-expiring sessions
+- **Responsive Design**: Works on desktop and tablet devices
 
 ### Analytics & Tracking
 - **Flask Backend API**: Complete tracking system for user behavior
@@ -82,7 +97,11 @@ npm install
 3. Create environment file:
 ```bash
 cp .env.local.example .env.local
-# Edit .env.local and set NEXT_PUBLIC_API_URL if needed
+# Edit .env.local and configure:
+# - NEXT_PUBLIC_API_URL (Flask backend URL)
+# - NEXT_PUBLIC_WHATSAPP_NUMBER (Your WhatsApp business number)
+# - NEXT_PUBLIC_ADMIN_USERNAME (Admin dashboard username)
+# - NEXT_PUBLIC_ADMIN_PASSWORD (Admin dashboard password - change in production!)
 ```
 
 4. Run the development server:
@@ -150,9 +169,10 @@ The API will be available at `http://localhost:5000`
 
 - **Desktop only**: Triggers when mouse leaves viewport from top
 - **Delay**: Activates after 3 seconds on page
-- **One-time**: Shows once per session
-- **Lead capture**: Collects name, email, phone, and message
-- **Tracking**: All interactions are tracked to backend
+- **Triggers every time**: Shows on every exit attempt for maximum lead capture
+- **Two-option design**: User chooses between email capture OR WhatsApp chat
+- **Simple & conversion-focused**: Minimal fields for higher conversion rates
+- **Tracking**: All interactions are tracked to backend with choice attribution
 
 ### Source Tracking
 
@@ -209,10 +229,18 @@ All WhatsApp CTAs:
 - Open in new tab/window
 - Work on mobile and desktop
 
-Update phone number in `utils/sourceTracking.ts`:
-```typescript
-const phoneNumber = '919999999999'; // Your WhatsApp number
+**Configuration**: WhatsApp number is now managed via environment variable:
+
+1. Update `.env.local`:
+```bash
+NEXT_PUBLIC_WHATSAPP_NUMBER=919999999999
 ```
+
+2. The number is automatically used across:
+   - Exit intent popup
+   - Contact forms
+   - WhatsApp CTA buttons
+   - All landing page components
 
 ## 🎨 Landing Page Comparison
 
@@ -309,6 +337,80 @@ Update `tailwind.config.ts`
 2. Run migrations
 3. Update API endpoints
 4. Update frontend tracking service
+
+## 🔐 Admin Dashboard
+
+### Access
+- URL: `/admin/login`
+- Default credentials: `admin` / `admin123`
+- **IMPORTANT**: Change credentials in production via `.env.local`
+
+### Features
+- **Dashboard Overview**: Real-time stats on sessions, events, leads, and conversion rate
+- **Analytics Viewer**: Detailed tables for sessions, events, and leads
+- **Time Filters**: View data from 24 hours to 90 days
+- **Export-ready**: All data in clean, structured format
+- **Mobile-friendly**: Responsive design for on-the-go monitoring
+
+### Pages
+1. **Dashboard** (`/admin/dashboard`): Overview with quick stats and actions
+2. **Analytics** (`/admin/analytics`): Detailed data tables with filtering
+
+### Security
+- Session-based authentication (24-hour expiry)
+- Client-side session storage
+- Protected routes (auto-redirect to login)
+- For production: Consider NextAuth.js or similar for enhanced security
+
+## 📸 Image Management
+
+### Quick Start
+1. Add images to `public/images/` folders
+2. Update `content/images.json` with image paths
+3. Images automatically load with placeholder fallbacks
+
+### Structure
+```
+public/images/
+├── hero/           # 1920x1080px - Hero backgrounds
+├── testimonials/   # 400x400px - User photos
+├── journey/        # 800x600px - Day-by-day images
+└── gallery/        # Flexible - Additional photos
+```
+
+### Documentation
+See `content/README.md` for:
+- How to add/update images
+- Image size recommendations
+- Compression tips
+- Using the image config utilities
+
+## 🚀 New Features Summary
+
+### ✅ Improved Exit Intent Popup
+- Triggers every time (not just once)
+- Simple email OR WhatsApp choice
+- Higher conversion design
+- Tracks user preference
+
+### ✅ Image Management System
+- JSON-based configuration
+- Automatic placeholder fallbacks
+- Organized folder structure
+- Easy to update without code changes
+
+### ✅ Admin Dashboard
+- Secure login system
+- Real-time analytics
+- Beautiful data visualization
+- Time range filtering
+- Lead management
+
+### ✅ Environment Variables
+- WhatsApp number configurable
+- Admin credentials in .env
+- API URL management
+- Easy deployment configuration
 
 ## 📄 License
 
