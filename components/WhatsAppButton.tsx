@@ -1,23 +1,30 @@
 'use client';
 
 import { getStoredSource, getWhatsAppUrl } from '@/utils/sourceTracking';
+import trackingService from '@/services/trackingService';
 
 interface WhatsAppButtonProps {
   message: string;
   className?: string;
   children: React.ReactNode;
   variant?: 'primary' | 'secondary';
+  location?: string;
 }
 
 export default function WhatsAppButton({
   message,
   className = '',
   children,
-  variant = 'primary'
+  variant = 'primary',
+  location = 'unknown'
 }: WhatsAppButtonProps) {
   const handleClick = () => {
     const sourceData = getStoredSource();
     const url = getWhatsAppUrl(message, sourceData?.source);
+
+    // Track WhatsApp click
+    trackingService.trackWhatsAppClick(location, String(children));
+
     window.open(url, '_blank');
   };
 
