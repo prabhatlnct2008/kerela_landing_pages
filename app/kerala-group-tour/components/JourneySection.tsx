@@ -40,7 +40,9 @@ export default function JourneySection() {
                 </li>
               </ul>
             </div>
-            <div className="hidden md:block w-32 h-32 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex-shrink-0"></div>
+            <div className="hidden md:block w-32 h-32 rounded-lg flex-shrink-0 overflow-hidden">
+              <img src="/images/journey/day-1-arrival.jpg" alt="Welcome to Kerala" className="w-full h-full object-cover" loading="lazy" />
+            </div>
           </div>
 
           {/* Day 2 */}
@@ -63,7 +65,9 @@ export default function JourneySection() {
                 </li>
               </ul>
             </div>
-            <div className="hidden md:block w-32 h-32 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg flex-shrink-0"></div>
+            <div className="hidden md:block w-32 h-32 rounded-lg flex-shrink-0 overflow-hidden">
+              <img src="/images/journey/day-2-hills.jpg" alt="Exploring the hills" className="w-full h-full object-cover" loading="lazy" />
+            </div>
           </div>
 
           {/* Day 3 */}
@@ -82,7 +86,9 @@ export default function JourneySection() {
                 </li>
               </ul>
             </div>
-            <div className="hidden md:block w-32 h-32 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex-shrink-0"></div>
+            <div className="hidden md:block w-32 h-32 rounded-lg flex-shrink-0 overflow-hidden">
+              <img src="/images/journey/day-3-wildlife.jpg" alt="Wildlife experience" className="w-full h-full object-cover" loading="lazy" />
+            </div>
           </div>
 
           {/* Day 4 */}
@@ -101,7 +107,9 @@ export default function JourneySection() {
                 </li>
               </ul>
             </div>
-            <div className="hidden md:block w-32 h-32 bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg flex-shrink-0"></div>
+            <div className="hidden md:block w-32 h-32 rounded-lg flex-shrink-0 overflow-hidden">
+              <img src="/images/journey/day-4-backwaters.jpg" alt="Backwater cruise" className="w-full h-full object-cover" loading="lazy" />
+            </div>
           </div>
 
           {/* Day 5 */}
@@ -120,7 +128,9 @@ export default function JourneySection() {
                 </li>
               </ul>
             </div>
-            <div className="hidden md:block w-32 h-32 bg-gradient-to-br from-gray-200 to-gray-300 rounded-lg flex-shrink-0"></div>
+            <div className="hidden md:block w-32 h-32 rounded-lg flex-shrink-0 overflow-hidden">
+              <img src="/images/journey/day-5-beach.jpg" alt="Beach relaxation" className="w-full h-full object-cover" loading="lazy" />
+            </div>
           </div>
         </div>
 
