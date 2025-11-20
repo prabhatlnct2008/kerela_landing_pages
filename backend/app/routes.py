@@ -409,3 +409,239 @@ def get_lead_sessions_events():
             'success': False,
             'error': str(e)
         }), 500
+
+
+@tracking_bp.route('/analytics/pages/summary', methods=['GET'])
+def get_pages_summary():
+    """Get analytics summary per page"""
+    try:
+        days = request.args.get('days', 7, type=int)
+        since = datetime.utcnow() - timedelta(days=days)
+
+        # Get all unique pages
+        pages = db.session.query(Session.page).distinct().all()
+        page_list = [p[0] for p in pages if p[0]]
+
+        results = []
+        for page in page_list:
+            # Sessions count for this page
+            sessions_count = Session.query.filter(
+                Session.page == page,
+                Session.created_at >= since
+            ).count()
+
+            # Get session IDs for this page
+            session_ids = [s.session_id for s in Session.query.filter(
+                Session.page == page,
+                Session.created_at >= since
+            ).all()]
+
+            # Events count for sessions on this page
+            events_count = 0
+            if session_ids:
+                events_count = Event.query.filter(
+                    Event.session_id.in_(session_ids),
+                    Event.timestamp >= since
+                ).count()
+
+            # Leads count for sessions on this page
+            leads_count = 0
+            if session_ids:
+                leads_count = UserDetail.query.filter(
+                    UserDetail.session_id.in_(session_ids),
+                    UserDetail.created_at >= since
+                ).count()
+
+            # Conversion rate
+            conversion_rate = (leads_count / sessions_count * 100) if sessions_count > 0 else 0
+
+            results.append({
+                'page': page,
+                'sessions': sessions_count,
+                'events': events_count,
+                'leads': leads_count,
+                'conversion_rate': round(conversion_rate, 1)
+            })
+
+        # Sort by sessions descending
+        results.sort(key=lambda x: x['sessions'], reverse=True)
+
+        return jsonify({
+            'success': True,
+            'days': days,
+            'pages': results
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error fetching pages summary: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@tracking_bp.route('/analytics/pages/comparison', methods=['GET'])
+def get_pages_comparison():
+    """Get side-by-side comparison data for pages"""
+    try:
+        days = request.args.get('days', 7, type=int)
+        since = datetime.utcnow() - timedelta(days=days)
+
+        # Get all unique pages
+        pages = db.session.query(Session.page).distinct().all()
+        page_list = [p[0] for p in pages if p[0]]
+
+        # Events by page
+        events_by_page = []
+        leads_by_page = []
+
+        for page in page_list:
+            # Get session IDs for this page
+            session_ids = [s.session_id for s in Session.query.filter(
+                Session.page == page,
+                Session.created_at >= since
+            ).all()]
+
+            if session_ids:
+                # Events for this page
+                events_count = Event.query.filter(
+                    Event.session_id.in_(session_ids),
+                    Event.timestamp >= since
+                ).count()
+                events_by_page.append({'page': page, 'count': events_count})
+
+                # Leads for this page
+                leads_count = UserDetail.query.filter(
+                    UserDetail.session_id.in_(session_ids),
+                    UserDetail.created_at >= since
+                ).count()
+                leads_by_page.append({'page': page, 'count': leads_count})
+            else:
+                events_by_page.append({'page': page, 'count': 0})
+                leads_by_page.append({'page': page, 'count': 0})
+
+        # Sort by count descending
+        events_by_page.sort(key=lambda x: x['count'], reverse=True)
+        leads_by_page.sort(key=lambda x: x['count'], reverse=True)
+
+        # Top event types by page
+        event_types_by_page = {}
+        for page in page_list:
+            session_ids = [s.session_id for s in Session.query.filter(
+                Session.page == page,
+                Session.created_at >= since
+            ).all()]
+
+            if session_ids:
+                top_events = db.session.query(
+                    Event.event_type,
+                    func.count(Event.id).label('count')
+                ).filter(
+                    Event.session_id.in_(session_ids),
+                    Event.timestamp >= since
+                ).group_by(
+                    Event.event_type
+                ).order_by(
+                    func.count(Event.id).desc()
+                ).limit(5).all()
+
+                event_types_by_page[page] = [
+                    {'event_type': et[0], 'count': et[1]}
+                    for et in top_events
+                ]
+
+        return jsonify({
+            'success': True,
+            'days': days,
+            'events_by_page': events_by_page,
+            'leads_by_page': leads_by_page,
+            'event_types_by_page': event_types_by_page
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error fetching pages comparison: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@tracking_bp.route('/analytics/filtered', methods=['GET'])
+def get_filtered_analytics():
+    """Get analytics filtered by page"""
+    try:
+        days = request.args.get('days', 7, type=int)
+        page_filter = request.args.get('page')
+        limit = request.args.get('limit', 100, type=int)
+
+        since = datetime.utcnow() - timedelta(days=days)
+
+        # Get sessions
+        sessions_query = Session.query.filter(Session.created_at >= since)
+        if page_filter:
+            sessions_query = sessions_query.filter(Session.page == page_filter)
+        sessions = sessions_query.order_by(Session.created_at.desc()).limit(limit).all()
+
+        session_ids = [s.session_id for s in sessions]
+
+        # Get events for these sessions
+        events = []
+        if session_ids:
+            events = Event.query.filter(
+                Event.session_id.in_(session_ids),
+                Event.timestamp >= since
+            ).order_by(Event.timestamp.desc()).limit(limit).all()
+
+        # Get leads for these sessions
+        leads = []
+        if session_ids:
+            leads = UserDetail.query.filter(
+                UserDetail.session_id.in_(session_ids),
+                UserDetail.created_at >= since
+            ).order_by(UserDetail.created_at.desc()).limit(limit).all()
+
+        # Get event aggregation for these sessions
+        event_aggregation = []
+        if session_ids:
+            agg_results = db.session.query(
+                Event.event_type,
+                func.count(Event.id).label('count')
+            ).filter(
+                Event.session_id.in_(session_ids),
+                Event.timestamp >= since
+            ).group_by(
+                Event.event_type
+            ).order_by(
+                func.count(Event.id).desc()
+            ).limit(20).all()
+
+            event_aggregation = [
+                {'event_type': row[0], 'count': row[1]}
+                for row in agg_results
+            ]
+
+        return jsonify({
+            'success': True,
+            'days': days,
+            'page_filter': page_filter,
+            'sessions': {
+                'count': len(sessions),
+                'data': [s.to_dict() for s in sessions]
+            },
+            'events': {
+                'count': len(events),
+                'data': [e.to_dict() for e in events]
+            },
+            'leads': {
+                'count': len(leads),
+                'data': [l.to_dict() for l in leads]
+            },
+            'event_aggregation': event_aggregation
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error fetching filtered analytics: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500

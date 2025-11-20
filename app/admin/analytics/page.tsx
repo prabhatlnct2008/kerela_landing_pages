@@ -49,23 +49,41 @@ interface LeadSession {
   events_breakdown: Record<string, number>;
 }
 
-type TabType = 'sessions' | 'events' | 'leads' | 'event-stats' | 'lead-insights';
+interface PageSummary {
+  page: string;
+  sessions: number;
+  events: number;
+  leads: number;
+  conversion_rate: number;
+}
+
+interface PageComparison {
+  page: string;
+  count: number;
+}
+
+type TabType = 'sessions' | 'events' | 'leads' | 'event-stats' | 'lead-insights' | 'page-analytics';
 
 export default function AnalyticsPage() {
-  const [activeTab, setActiveTab] = useState<TabType>('sessions');
+  const [activeTab, setActiveTab] = useState<TabType>('page-analytics');
   const [sessions, setSessions] = useState<Session[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [leads, setLeads] = useState<UserDetail[]>([]);
   const [eventAggregation, setEventAggregation] = useState<EventAggregation[]>([]);
   const [leadSessions, setLeadSessions] = useState<LeadSession[]>([]);
   const [aggregatedLeadEvents, setAggregatedLeadEvents] = useState<EventAggregation[]>([]);
+  const [pageSummary, setPageSummary] = useState<PageSummary[]>([]);
+  const [eventsByPage, setEventsByPage] = useState<PageComparison[]>([]);
+  const [leadsByPage, setLeadsByPage] = useState<PageComparison[]>([]);
+  const [availablePages, setAvailablePages] = useState<string[]>([]);
+  const [pageFilter, setPageFilter] = useState<string>('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [days, setDays] = useState(7);
 
   useEffect(() => {
     fetchData();
-  }, [activeTab, days]);
+  }, [activeTab, days, pageFilter]);
 
   const fetchData = async () => {
     setIsLoading(true);
@@ -74,22 +92,59 @@ export default function AnalyticsPage() {
     try {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
-      if (activeTab === 'sessions') {
-        const res = await fetch(`${apiUrl}/analytics/sessions?days=${days}`);
+      // Always fetch page summary to populate filter
+      if (availablePages.length === 0) {
+        const summaryRes = await fetch(`${apiUrl}/analytics/pages/summary?days=${days}`);
+        const summaryData = await summaryRes.json();
+        if (summaryData.pages) {
+          setAvailablePages(summaryData.pages.map((p: PageSummary) => p.page));
+        }
+      }
+
+      if (activeTab === 'page-analytics') {
+        // Fetch page summary and comparison
+        const [summaryRes, comparisonRes] = await Promise.all([
+          fetch(`${apiUrl}/analytics/pages/summary?days=${days}`),
+          fetch(`${apiUrl}/analytics/pages/comparison?days=${days}`)
+        ]);
+        const summaryData = await summaryRes.json();
+        const comparisonData = await comparisonRes.json();
+
+        setPageSummary(summaryData.pages || []);
+        setEventsByPage(comparisonData.events_by_page || []);
+        setLeadsByPage(comparisonData.leads_by_page || []);
+        setAvailablePages(summaryData.pages?.map((p: PageSummary) => p.page) || []);
+      } else if (activeTab === 'sessions') {
+        const url = pageFilter
+          ? `${apiUrl}/analytics/filtered?days=${days}&page=${encodeURIComponent(pageFilter)}`
+          : `${apiUrl}/analytics/sessions?days=${days}`;
+        const res = await fetch(url);
         const data = await res.json();
-        setSessions(data.sessions || []);
+        setSessions(pageFilter ? data.sessions?.data || [] : data.sessions || []);
       } else if (activeTab === 'events') {
-        const res = await fetch(`${apiUrl}/analytics/events?days=${days}`);
+        const url = pageFilter
+          ? `${apiUrl}/analytics/filtered?days=${days}&page=${encodeURIComponent(pageFilter)}`
+          : `${apiUrl}/analytics/events?days=${days}`;
+        const res = await fetch(url);
         const data = await res.json();
-        setEvents(data.events || []);
+        setEvents(pageFilter ? data.events?.data || [] : data.events || []);
       } else if (activeTab === 'leads') {
-        const res = await fetch(`${apiUrl}/analytics/user-details?days=${days}`);
+        const url = pageFilter
+          ? `${apiUrl}/analytics/filtered?days=${days}&page=${encodeURIComponent(pageFilter)}`
+          : `${apiUrl}/analytics/user-details?days=${days}`;
+        const res = await fetch(url);
         const data = await res.json();
-        setLeads(data.user_details || []);
+        setLeads(pageFilter ? data.leads?.data || [] : data.user_details || []);
       } else if (activeTab === 'event-stats') {
-        const res = await fetch(`${apiUrl}/analytics/events/aggregation?days=${days}&limit=20`);
-        const data = await res.json();
-        setEventAggregation(data.aggregation || []);
+        if (pageFilter) {
+          const res = await fetch(`${apiUrl}/analytics/filtered?days=${days}&page=${encodeURIComponent(pageFilter)}`);
+          const data = await res.json();
+          setEventAggregation(data.event_aggregation || []);
+        } else {
+          const res = await fetch(`${apiUrl}/analytics/events/aggregation?days=${days}&limit=20`);
+          const data = await res.json();
+          setEventAggregation(data.aggregation || []);
+        }
       } else if (activeTab === 'lead-insights') {
         const res = await fetch(`${apiUrl}/analytics/leads/events?days=${days}`);
         const data = await res.json();
@@ -122,6 +177,7 @@ export default function AnalyticsPage() {
   };
 
   const tabs = [
+    { id: 'page-analytics' as TabType, label: 'Page Analytics', icon: '📄', count: pageSummary.length },
     { id: 'sessions' as TabType, label: 'Sessions', icon: '👥', count: sessions.length },
     { id: 'events' as TabType, label: 'Events', icon: '📊', count: events.length },
     { id: 'leads' as TabType, label: 'Leads', icon: '🎯', count: leads.length },
@@ -143,21 +199,42 @@ export default function AnalyticsPage() {
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Analytics</h1>
-            <p className="text-gray-600">Detailed tracking data and user behavior</p>
+            <p className="text-gray-600">
+              Detailed tracking data and user behavior
+              {pageFilter && <span className="ml-2 text-green-600 font-medium">• Filtered: {pageFilter}</span>}
+            </p>
           </div>
 
-          {/* Time Range Selector */}
-          <select
-            value={days}
-            onChange={(e) => setDays(Number(e.target.value))}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
-          >
-            {dayOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+          <div className="flex items-center gap-4">
+            {/* Page Filter */}
+            {activeTab !== 'page-analytics' && (
+              <select
+                value={pageFilter}
+                onChange={(e) => setPageFilter(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
+              >
+                <option value="">All Pages</option>
+                {availablePages.map((page) => (
+                  <option key={page} value={page}>
+                    {page}
+                  </option>
+                ))}
+              </select>
+            )}
+
+            {/* Time Range Selector */}
+            <select
+              value={days}
+              onChange={(e) => setDays(Number(e.target.value))}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none"
+            >
+              {dayOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -202,6 +279,158 @@ export default function AnalyticsPage() {
           </div>
         ) : (
           <>
+            {/* Page Analytics Tab */}
+            {activeTab === 'page-analytics' && (
+              <div className="space-y-6">
+                {/* Page Summary Table */}
+                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900">Page Performance Summary</h3>
+                  </div>
+                  {pageSummary.length === 0 ? (
+                    <div className="p-8 text-center text-gray-500">
+                      No page data found for the selected time period
+                    </div>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead className="bg-gray-50 border-b border-gray-200">
+                          <tr>
+                            <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase">Page</th>
+                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase">Sessions</th>
+                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase">Events</th>
+                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase">Leads</th>
+                            <th className="px-6 py-4 text-right text-xs font-semibold text-gray-600 uppercase">Conversion</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-gray-200">
+                          {pageSummary.map((page) => (
+                            <tr key={page.page} className="hover:bg-gray-50 transition">
+                              <td className="px-6 py-4">
+                                <span className="text-sm font-medium text-gray-900">{page.page}</span>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <span className="text-sm font-bold text-blue-600">{page.sessions}</span>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <span className="text-sm font-bold text-purple-600">{page.events}</span>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <span className="text-sm font-bold text-green-600">{page.leads}</span>
+                              </td>
+                              <td className="px-6 py-4 text-right">
+                                <span className={`text-sm font-bold ${page.conversion_rate > 5 ? 'text-green-600' : page.conversion_rate > 2 ? 'text-yellow-600' : 'text-gray-600'}`}>
+                                  {page.conversion_rate}%
+                                </span>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* Side-by-Side Comparison Graphs */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Events by Page */}
+                  <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Events by Page</h3>
+                    {eventsByPage.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500">No data</div>
+                    ) : (
+                      <div className="space-y-3">
+                        {eventsByPage.map((item) => {
+                          const maxCount = eventsByPage[0]?.count || 1;
+                          const percentage = (item.count / maxCount) * 100;
+                          return (
+                            <div key={item.page}>
+                              <div className="flex justify-between mb-1">
+                                <span className="text-sm font-medium text-gray-700 truncate" title={item.page}>
+                                  {item.page}
+                                </span>
+                                <span className="text-sm font-bold text-purple-600">{item.count}</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full transition-all duration-500"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Leads by Page */}
+                  <div className="bg-white rounded-xl border border-gray-200 p-6">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-6">Leads by Page</h3>
+                    {leadsByPage.length === 0 ? (
+                      <div className="p-4 text-center text-gray-500">No data</div>
+                    ) : (
+                      <div className="space-y-3">
+                        {leadsByPage.map((item) => {
+                          const maxCount = leadsByPage[0]?.count || 1;
+                          const percentage = (item.count / maxCount) * 100;
+                          return (
+                            <div key={item.page}>
+                              <div className="flex justify-between mb-1">
+                                <span className="text-sm font-medium text-gray-700 truncate" title={item.page}>
+                                  {item.page}
+                                </span>
+                                <span className="text-sm font-bold text-green-600">{item.count}</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-500"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* Conversion Rate Comparison */}
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Conversion Rate by Page</h3>
+                  {pageSummary.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500">No data</div>
+                  ) : (
+                    <div className="space-y-3">
+                      {pageSummary
+                        .sort((a, b) => b.conversion_rate - a.conversion_rate)
+                        .map((page) => {
+                          const maxRate = Math.max(...pageSummary.map(p => p.conversion_rate)) || 1;
+                          const percentage = (page.conversion_rate / maxRate) * 100;
+                          return (
+                            <div key={page.page}>
+                              <div className="flex justify-between mb-1">
+                                <span className="text-sm font-medium text-gray-700 truncate" title={page.page}>
+                                  {page.page}
+                                </span>
+                                <span className="text-sm font-bold text-orange-600">{page.conversion_rate}%</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-orange-500 to-orange-600 rounded-full transition-all duration-500"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             {/* Sessions Tab */}
             {activeTab === 'sessions' && (
               <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
