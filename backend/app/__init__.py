@@ -18,7 +18,19 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     migrate.init_app(app, db)
-    CORS(app, origins=['http://localhost:3000', 'http://localhost:3001'])
+
+    # CORS configuration - allow Vercel and localhost
+    allowed_origins = [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'https://kerela-landing-pages.vercel.app',
+        'https://*.vercel.app'  # Allow all Vercel preview deployments
+    ]
+    # Add custom origins from environment variable
+    custom_origins = os.getenv('CORS_ORIGINS', '').split(',')
+    allowed_origins.extend([o.strip() for o in custom_origins if o.strip()])
+
+    CORS(app, origins=allowed_origins, supports_credentials=True)
 
     # Register blueprints
     from app.routes import tracking_bp
