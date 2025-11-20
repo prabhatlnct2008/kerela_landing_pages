@@ -38,13 +38,13 @@ export default function AdminDashboardPage() {
       const events = await eventsRes.json();
       const leads = await leadsRes.json();
 
-      const totalSessions = sessions.total || 0;
-      const totalLeads = leads.total || 0;
+      const totalSessions = sessions.count || sessions.total || 0;
+      const totalLeads = leads.count || leads.total || 0;
       const conversionRate = totalSessions > 0 ? (totalLeads / totalSessions) * 100 : 0;
 
       setStats({
         totalSessions,
-        totalEvents: events.total || 0,
+        totalEvents: events.count || events.total || 0,
         totalLeads,
         conversionRate: Math.round(conversionRate * 10) / 10
       });
