@@ -32,7 +32,7 @@ export default function HeroSection() {
         {/* Pricing Box */}
         <div className="bg-white/95 backdrop-blur-sm text-gray-800 rounded-2xl p-6 max-w-md mx-auto mb-8 shadow-2xl">
           <p className="text-sm text-gray-600 mb-2">Starting at</p>
-          <p className="text-5xl font-bold mb-2">₹44,999</p>
+          <p className="text-5xl font-bold mb-2">₹45,000</p>
           <p className="text-sm text-gray-600">
             per person • All-inclusive basics • No hidden fees
           </p>

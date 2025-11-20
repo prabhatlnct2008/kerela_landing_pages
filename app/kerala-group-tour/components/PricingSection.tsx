@@ -6,7 +6,7 @@ export default function PricingSection() {
       <div className="container mx-auto px-4 max-w-4xl">
         {/* Section Header */}
         <h2 className="text-3xl md:text-4xl font-bold text-center mb-4 text-gray-900">
-          Why ₹44,999 is a fair price
+          Why ₹45,000 is a fair price
         </h2>
         <p className="text-center text-gray-600 mb-16">
           Complete transparency, no hidden costs
@@ -25,7 +25,7 @@ export default function PricingSection() {
                 </div>
                 <span className="text-lg text-gray-800">Accommodation (4 nights, premium picks)</span>
               </div>
-              <span className="text-xl font-bold text-gray-900">₹15,000</span>
+              <span className="text-xl font-bold text-gray-900">₹21,000</span>
             </div>
 
             {/* Private Transfers */}
@@ -88,7 +88,7 @@ export default function PricingSection() {
               </div>
               <div className="flex justify-between items-center">
                 <span className="text-2xl font-bold text-gray-900">Our price:</span>
-                <span className="text-4xl font-bold text-teal-600">₹44,999</span>
+                <span className="text-4xl font-bold text-teal-600">₹45,000</span>
               </div>
               <p className="text-sm text-gray-500 italic mt-2">Limited batch pricing</p>
             </div>

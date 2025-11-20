@@ -40,7 +40,7 @@ export default function HeroSection() {
           {/* Pricing Box */}
           <div className="bg-white rounded-2xl p-6 max-w-sm mb-8 shadow-lg border border-gray-100">
             <p className="text-sm text-gray-600 mb-2">Starting at</p>
-            <p className="text-5xl font-bold mb-2 text-teal-600">₹44,999</p>
+            <p className="text-5xl font-bold mb-2 text-teal-600">₹45,000</p>
             <p className="text-sm text-gray-600">
               /person
             </p>
@@ -76,27 +76,29 @@ export default function HeroSection() {
 
         {/* Image Grid */}
         <div className="grid grid-cols-3 gap-4 mt-16 max-w-4xl">
-          <div className="aspect-square rounded-lg overflow-hidden shadow-lg" style={{ backgroundColor: '#d4e8dc' }}>
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
-              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
+          <div className="aspect-square rounded-lg overflow-hidden shadow-lg">
+            <img
+              src="/images/journey/day-1-kochi.jpg"
+              alt="Kerala backwaters"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
-          <div className="aspect-square rounded-lg overflow-hidden shadow-lg" style={{ backgroundColor: '#b8d4e8' }}>
-            <div className="w-full h-full flex items-center justify-center text-gray-400">
-              <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
+          <div className="aspect-square rounded-lg overflow-hidden shadow-lg">
+            <img
+              src="/images/journey/day-2-munnar.jpg"
+              alt="Munnar tea plantations"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
-          <div className="aspect-square rounded-lg overflow-hidden shadow-lg bg-red-600 relative">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <span className="text-6xl">😂</span>
-            </div>
-            <div className="absolute top-2 right-2 bg-white/90 px-2 py-1 rounded text-xs font-semibold">
-              Made in Bolt
-            </div>
+          <div className="aspect-square rounded-lg overflow-hidden shadow-lg">
+            <img
+              src="/images/journey/day-3-thekkady.jpg"
+              alt="Munnar sightseeing"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
         </div>
       </div>

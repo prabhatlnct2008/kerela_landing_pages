@@ -17,7 +17,7 @@ import Footer from './components/Footer';
 
 export const metadata = {
   title: 'Kerala 4 Nights • 5 Days - Premium Small-Group Escapes | Kerala Wanderers',
-  description: 'Experience authentic Kerala with local guides. Houseboat nights, Munnar tea hills, and curated comfort for small groups (12-15). Starting at ₹44,999 per person.',
+  description: 'Experience authentic Kerala with local guides. Houseboat nights, Munnar tea hills, and curated comfort for small groups (12-15). Starting at ₹45,000 per person.',
 };
 
 export default function KeralaPremiumEscape() {
