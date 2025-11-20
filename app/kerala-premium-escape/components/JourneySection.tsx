@@ -128,8 +128,8 @@ export default function JourneySection() {
           <div className="grid md:grid-cols-2 gap-8 items-center">
             <div className="aspect-video rounded-2xl overflow-hidden shadow-lg md:order-2">
               <img
-                src="/images/journey/day-4-alleppey.jpg"
-                alt="Alleppey - Houseboat on backwaters"
+                src="/images/journey/day-4-local.png"
+                alt="Local experiences - Activities and adventures"
                 className="w-full h-full object-cover"
                 loading="lazy"
               />

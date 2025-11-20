@@ -41,7 +41,7 @@ export default function JourneySection() {
               </ul>
             </div>
             <div className="hidden md:block w-32 h-32 rounded-lg flex-shrink-0 overflow-hidden">
-              <img src="/images/journey/day-1-arrival.jpg" alt="Welcome to Kerala" className="w-full h-full object-cover" loading="lazy" />
+              <img src="/images/journey/day-1-kochi.jpg" alt="Kochi to Alleppey backwaters" className="w-full h-full object-cover" loading="lazy" />
             </div>
           </div>
 
@@ -66,7 +66,7 @@ export default function JourneySection() {
               </ul>
             </div>
             <div className="hidden md:block w-32 h-32 rounded-lg flex-shrink-0 overflow-hidden">
-              <img src="/images/journey/day-2-hills.jpg" alt="Exploring the hills" className="w-full h-full object-cover" loading="lazy" />
+              <img src="/images/journey/day-2-munnar.jpg" alt="Scenic drive to Munnar" className="w-full h-full object-cover" loading="lazy" />
             </div>
           </div>
 
@@ -87,7 +87,7 @@ export default function JourneySection() {
               </ul>
             </div>
             <div className="hidden md:block w-32 h-32 rounded-lg flex-shrink-0 overflow-hidden">
-              <img src="/images/journey/day-3-wildlife.jpg" alt="Wildlife experience" className="w-full h-full object-cover" loading="lazy" />
+              <img src="/images/journey/day-3-thekkady.jpg" alt="Munnar tea plantations" className="w-full h-full object-cover" loading="lazy" />
             </div>
           </div>
 
@@ -108,7 +108,7 @@ export default function JourneySection() {
               </ul>
             </div>
             <div className="hidden md:block w-32 h-32 rounded-lg flex-shrink-0 overflow-hidden">
-              <img src="/images/journey/day-4-backwaters.jpg" alt="Backwater cruise" className="w-full h-full object-cover" loading="lazy" />
+              <img src="/images/journey/day-4-local.png" alt="Local experiences and adventures" className="w-full h-full object-cover" loading="lazy" />
             </div>
           </div>
 
@@ -129,7 +129,7 @@ export default function JourneySection() {
               </ul>
             </div>
             <div className="hidden md:block w-32 h-32 rounded-lg flex-shrink-0 overflow-hidden">
-              <img src="/images/journey/day-5-beach.jpg" alt="Beach relaxation" className="w-full h-full object-cover" loading="lazy" />
+              <img src="/images/journey/day-5-departure.jpg" alt="Departure day memories" className="w-full h-full object-cover" loading="lazy" />
             </div>
           </div>
         </div>
