@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify
 from app import db
 from app.models import Session, Event, UserDetail
 from datetime import datetime, timedelta
+from sqlalchemy import func
 import logging
 import uuid
 
@@ -273,6 +274,137 @@ def get_user_details():
 
     except Exception as e:
         logger.error(f"Error fetching user details: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@tracking_bp.route('/analytics/events/aggregation', methods=['GET'])
+def get_events_aggregation():
+    """Get top events aggregated by count"""
+    try:
+        days = request.args.get('days', 7, type=int)
+        limit = request.args.get('limit', 20, type=int)
+
+        since = datetime.utcnow() - timedelta(days=days)
+
+        # Query to aggregate events by type
+        results = db.session.query(
+            Event.event_type,
+            func.count(Event.id).label('count')
+        ).filter(
+            Event.timestamp >= since
+        ).group_by(
+            Event.event_type
+        ).order_by(
+            func.count(Event.id).desc()
+        ).limit(limit).all()
+
+        aggregation = [
+            {
+                'event_type': row[0],
+                'count': row[1]
+            }
+            for row in results
+        ]
+
+        return jsonify({
+            'success': True,
+            'days': days,
+            'aggregation': aggregation
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error fetching events aggregation: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+
+@tracking_bp.route('/analytics/leads/events', methods=['GET'])
+def get_lead_sessions_events():
+    """Get event counts for lead-generating sessions"""
+    try:
+        days = request.args.get('days', 7, type=int)
+        limit = request.args.get('limit', 50, type=int)
+
+        since = datetime.utcnow() - timedelta(days=days)
+
+        # Get sessions that have user details (leads)
+        lead_sessions = db.session.query(
+            UserDetail.session_id,
+            UserDetail.name,
+            UserDetail.email,
+            UserDetail.form_type,
+            UserDetail.created_at
+        ).filter(
+            UserDetail.created_at >= since
+        ).order_by(
+            UserDetail.created_at.desc()
+        ).limit(limit).all()
+
+        results = []
+        for lead in lead_sessions:
+            # Get event counts for this session, grouped by event type
+            event_counts = db.session.query(
+                Event.event_type,
+                func.count(Event.id).label('count')
+            ).filter(
+                Event.session_id == lead.session_id
+            ).group_by(
+                Event.event_type
+            ).all()
+
+            # Total events for this session
+            total_events = sum(ec[1] for ec in event_counts)
+
+            # Event breakdown
+            events_breakdown = {ec[0]: ec[1] for ec in event_counts}
+
+            results.append({
+                'session_id': lead.session_id,
+                'lead_name': lead.name or 'Anonymous',
+                'lead_email': lead.email,
+                'form_type': lead.form_type,
+                'created_at': lead.created_at.isoformat() if lead.created_at else None,
+                'total_events': total_events,
+                'events_breakdown': events_breakdown
+            })
+
+        # Also get aggregated stats across all lead sessions
+        all_session_ids = [r['session_id'] for r in results]
+
+        if all_session_ids:
+            event_type_totals = db.session.query(
+                Event.event_type,
+                func.count(Event.id).label('count')
+            ).filter(
+                Event.session_id.in_(all_session_ids)
+            ).group_by(
+                Event.event_type
+            ).order_by(
+                func.count(Event.id).desc()
+            ).all()
+
+            aggregated_events = [
+                {'event_type': et[0], 'count': et[1]}
+                for et in event_type_totals
+            ]
+        else:
+            aggregated_events = []
+
+        return jsonify({
+            'success': True,
+            'days': days,
+            'total_leads': len(results),
+            'lead_sessions': results,
+            'aggregated_events': aggregated_events
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Error fetching lead sessions events: {str(e)}")
         return jsonify({
             'success': False,
             'error': str(e)

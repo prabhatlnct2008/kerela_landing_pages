@@ -26,13 +26,15 @@ class Session(db.Model):
         return {
             'id': self.id,
             'session_id': self.session_id,
-            'page': self.page,
+            'page_name': self.page,
             'source': self.source,
             'utm_source': self.utm_source,
             'utm_medium': self.utm_medium,
             'utm_campaign': self.utm_campaign,
             'referrer': self.referrer,
-            'created_at': self.created_at.isoformat()
+            'user_agent': self.user_agent,
+            'ip_address': self.ip_address,
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
 
@@ -62,7 +64,7 @@ class Event(db.Model):
             'element_text': self.element_text,
             'page_url': self.page_url,
             'metadata': self.extra_data,  # Return as 'metadata' in API for consistency
-            'timestamp': self.timestamp.isoformat()
+            'created_at': self.timestamp.isoformat() if self.timestamp else None
         }
 
 
@@ -90,5 +92,5 @@ class UserDetail(db.Model):
             'message': self.message,
             'form_type': self.form_type,
             'metadata': self.extra_data,  # Return as 'metadata' in API for consistency
-            'created_at': self.created_at.isoformat()
+            'created_at': self.created_at.isoformat() if self.created_at else None
         }
