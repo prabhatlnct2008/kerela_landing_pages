@@ -34,13 +34,31 @@ interface UserDetail {
   created_at: string;
 }
 
-type TabType = 'sessions' | 'events' | 'leads';
+interface EventAggregation {
+  event_type: string;
+  count: number;
+}
+
+interface LeadSession {
+  session_id: string;
+  lead_name: string;
+  lead_email: string | null;
+  form_type: string;
+  created_at: string;
+  total_events: number;
+  events_breakdown: Record<string, number>;
+}
+
+type TabType = 'sessions' | 'events' | 'leads' | 'event-stats' | 'lead-insights';
 
 export default function AnalyticsPage() {
   const [activeTab, setActiveTab] = useState<TabType>('sessions');
   const [sessions, setSessions] = useState<Session[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [leads, setLeads] = useState<UserDetail[]>([]);
+  const [eventAggregation, setEventAggregation] = useState<EventAggregation[]>([]);
+  const [leadSessions, setLeadSessions] = useState<LeadSession[]>([]);
+  const [aggregatedLeadEvents, setAggregatedLeadEvents] = useState<EventAggregation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
   const [days, setDays] = useState(7);
@@ -68,6 +86,15 @@ export default function AnalyticsPage() {
         const res = await fetch(`${apiUrl}/analytics/user-details?days=${days}`);
         const data = await res.json();
         setLeads(data.user_details || []);
+      } else if (activeTab === 'event-stats') {
+        const res = await fetch(`${apiUrl}/analytics/events/aggregation?days=${days}&limit=20`);
+        const data = await res.json();
+        setEventAggregation(data.aggregation || []);
+      } else if (activeTab === 'lead-insights') {
+        const res = await fetch(`${apiUrl}/analytics/leads/events?days=${days}`);
+        const data = await res.json();
+        setLeadSessions(data.lead_sessions || []);
+        setAggregatedLeadEvents(data.aggregated_events || []);
       }
     } catch (err) {
       console.error('Error fetching analytics:', err);
@@ -91,7 +118,9 @@ export default function AnalyticsPage() {
   const tabs = [
     { id: 'sessions' as TabType, label: 'Sessions', icon: '👥', count: sessions.length },
     { id: 'events' as TabType, label: 'Events', icon: '📊', count: events.length },
-    { id: 'leads' as TabType, label: 'Leads', icon: '🎯', count: leads.length }
+    { id: 'leads' as TabType, label: 'Leads', icon: '🎯', count: leads.length },
+    { id: 'event-stats' as TabType, label: 'Event Stats', icon: '📈', count: eventAggregation.length },
+    { id: 'lead-insights' as TabType, label: 'Lead Insights', icon: '🔍', count: leadSessions.length }
   ];
 
   const dayOptions = [
@@ -340,6 +369,132 @@ export default function AnalyticsPage() {
                     </table>
                   </div>
                 )}
+              </div>
+            )}
+
+            {/* Event Stats Tab - Bar Graph */}
+            {activeTab === 'event-stats' && (
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-6">Top 20 Events by Count</h3>
+                {eventAggregation.length === 0 ? (
+                  <div className="p-8 text-center text-gray-500">
+                    No events found for the selected time period
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {eventAggregation.map((item, index) => {
+                      const maxCount = eventAggregation[0]?.count || 1;
+                      const percentage = (item.count / maxCount) * 100;
+                      return (
+                        <div key={item.event_type} className="flex items-center gap-4">
+                          <div className="w-8 text-sm text-gray-500 text-right">{index + 1}</div>
+                          <div className="flex-grow">
+                            <div className="flex justify-between mb-1">
+                              <span className="text-sm font-medium text-gray-700">{item.event_type}</span>
+                              <span className="text-sm font-bold text-gray-900">{item.count}</span>
+                            </div>
+                            <div className="w-full bg-gray-100 rounded-full h-6 overflow-hidden">
+                              <div
+                                className="h-full bg-gradient-to-r from-purple-500 to-purple-600 rounded-full transition-all duration-500"
+                                style={{ width: `${percentage}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Lead Insights Tab */}
+            {activeTab === 'lead-insights' && (
+              <div className="space-y-6">
+                {/* Aggregated Events for Lead Sessions */}
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-6">Events in Lead-Generating Sessions</h3>
+                  {aggregatedLeadEvents.length === 0 ? (
+                    <div className="p-8 text-center text-gray-500">
+                      No lead sessions found for the selected time period
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      {aggregatedLeadEvents.slice(0, 10).map((item, index) => {
+                        const maxCount = aggregatedLeadEvents[0]?.count || 1;
+                        const percentage = (item.count / maxCount) * 100;
+                        return (
+                          <div key={item.event_type} className="flex items-center gap-4">
+                            <div className="w-6 text-sm text-gray-500 text-right">{index + 1}</div>
+                            <div className="flex-grow">
+                              <div className="flex justify-between mb-1">
+                                <span className="text-sm font-medium text-gray-700">{item.event_type}</span>
+                                <span className="text-sm font-bold text-gray-900">{item.count}</span>
+                              </div>
+                              <div className="w-full bg-gray-100 rounded-full h-4 overflow-hidden">
+                                <div
+                                  className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-500"
+                                  style={{ width: `${percentage}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+
+                {/* Individual Lead Sessions */}
+                <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900">Lead Session Details</h3>
+                    <p className="text-sm text-gray-500">Event breakdown per lead</p>
+                  </div>
+                  {leadSessions.length === 0 ? (
+                    <div className="p-8 text-center text-gray-500">
+                      No lead sessions found for the selected time period
+                    </div>
+                  ) : (
+                    <div className="divide-y divide-gray-200">
+                      {leadSessions.map((lead) => (
+                        <div key={lead.session_id} className="p-6 hover:bg-gray-50 transition">
+                          <div className="flex justify-between items-start mb-4">
+                            <div>
+                              <h4 className="font-semibold text-gray-900">{lead.lead_name}</h4>
+                              {lead.lead_email && (
+                                <p className="text-sm text-gray-600">{lead.lead_email}</p>
+                              )}
+                              <p className="text-xs text-gray-500 mt-1">
+                                {formatDate(lead.created_at)} • {lead.form_type}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-blue-100 text-blue-700">
+                                {lead.total_events} events
+                              </span>
+                            </div>
+                          </div>
+                          {Object.keys(lead.events_breakdown).length > 0 && (
+                            <div className="flex flex-wrap gap-2">
+                              {Object.entries(lead.events_breakdown)
+                                .sort(([, a], [, b]) => b - a)
+                                .map(([eventType, count]) => (
+                                  <span
+                                    key={eventType}
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded bg-gray-100 text-xs"
+                                  >
+                                    <span className="text-gray-700">{eventType}</span>
+                                    <span className="font-bold text-gray-900">{count}</span>
+                                  </span>
+                                ))}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </>
