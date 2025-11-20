@@ -5,7 +5,7 @@ import WhatsAppButton from '@/components/WhatsAppButton';
 export default function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center bg-cover bg-center" style={{
-      backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/images/kerala-palms.jpg)',
+      backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(/images/hero/kerala-backwaters.jpg)',
       backgroundColor: '#1e3a2e'
     }}>
       <div className="container mx-auto px-4 text-center text-white relative z-10">
